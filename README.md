@@ -24,7 +24,7 @@ bedtools getfasta -s -fi Myrtaceae_species_genome.fasta -bed Myrtaceae_speciesTI
 bedtools getfasta -s -fi Myrtaceae_species_genome.fasta -bed Myrtaceae_speciesnonTIR.bed -fo Myrtaceae_species_genome.nonTIR.fasta
 ```
 
-4. We took these outputs and created a single combined Myrtaceae_species_NBARC.fasta (from the Myrtaceae_species_genome.TIR.fasta and Myrtaceae_species_genome.nonTIR.fasta) and made species-specific hidden markov models in accordance with the HMMER user manual. That is, multiple sequence alignments made and output in stockholm format. These were used as input files to build the profile species-specific HMM.
+4. We took these outputs and created a single combined Myrtaceae_species_NBARC.fasta (from the Myrtaceae_species_genome.TIR.fasta and Myrtaceae_species_genome.nonTIR.fasta), removed duplicated sequences (using seqkit rmdup -s) and made species-specific hidden markov models in accordance with the HMMER user manual. That is, multiple sequence alignments made and output in stockholm format. These were used as input files to build the profile species-specific HMM.
 
 ```
 hmmbuild -nucleic Myrtaceae_species_NBARC.hmm clustalo-Myrtaceae_species_NBARC.stockholm

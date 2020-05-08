@@ -32,7 +32,7 @@ hmmbuild -nucleic Myrtaceae_species_NBARC.hmm clustalo-Myrtaceae_species_NBARC.s
 
 5. Step 1,2 and 3 from the species-specific HMM extracted stranded NBARC sequences from the genome. NB. Headers for the extracted fasta have (+) for forward strand and (-) for reverse for the location on the scaffold specified.  
 
-6. Nucleotide NBARC sequences were 6-frame translated using an adapted Bioseq script and the longest ORF frame output to fasta for downstream analysis. Total sequences from this set, containing the Walker A "GKT" **or** "GKS" **and** Walker B "LDD" strings of amino acids were extracted. **Note - NBARCs should be retained if both 'GKT/S' and 'LDD' strings are present.** 
+6. Nucleotide NBARC sequences were 6-frame translated using an adapted Bioseq script and the longest ORF frame output to fasta for downstream analysis. Total sequences from this set, containing the Walker A "GKT" **or** "GKS" **and** Walker B "LDD" **or** MDD strings of amino acids were extracted. **Note - NBARCs should be retained if both 'GKT/S' and 'M/LDD' strings are present.** 
 
 8. CC NBARC sequences with the canonical "W" tryptophan within the "LDD*W" (Pan et al. 2000) were identified (LDDVW = x, LDDLW = x, LDDIW = x, LDDTW = x, LDDAW = x, LDDMW = x). All sequences were aligned with 'n' E. grandis NBARC sequences, nonTIR and TIR using default parameters with clustalw. A neighbour-joining tree (using defaults, 1000 bootstraps) was constructed.
 

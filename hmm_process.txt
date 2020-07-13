@@ -1,0 +1,79 @@
+#!/bin/bash
+#PBS -P myrtaceae
+#PBS -N HMM
+#PBS -l select=1:ncpus=2:mem=5GB
+#PBS -l walltime=1:00:00
+#PBS -e ./hmm_eror.txt
+#PBS -o ./hmm_output.txt
+#PBS -M peri.tobias@sydney.edu.au
+#PBS -m abe
+
+#Parameters
+wdir=/scratch/myrtaceae
+outdir=$wdir/2.results
+
+# Load modules
+module load hmmer/3.3
+module load bedtools/2.29.2
+module load seqkit/0.10.1
+module load clustal-omega/1.2.4
+module load python/3.6.5
+
+##Also all additional scripts in home directory or path specified. This script will run through all the steps and output an exended nt fasta for NBARC regions in genome plus an amino acid fasta for the NBARC regions.
+##We pass the genome and prefix for outputs when submitting the pbs script, for example: qsub -v prefix_name=E_grandis,input_fasta=E_grandis.fasta myrtaceae_hmm.pbs
+
+cd $PBS_O_WORKDIR
+
+##Step A - run HMM - we use the Egrandis TIR and nonTIR HMMs (Christie et al. 2016) to identify NBARC regions within our chosen Myrtaceae genome.
+nhmmer $wdir/1.data/EG_nonTIRhmm $wdir/1.data/$input_fasta > $outdir/${prefix_name}_nonTIRout
+nhmmer $wdir/1.data/EG_TIRhmm $wdir/1.data/$input_fasta > $outdir/${prefix_name}_TIRout
+
+## Output from first step is used to make a bed file to extract NBARC sequences from the original genome fasta. We then combine the two fasta outputs and remove duplicates.
+make_bed_hmmOut.awk $outdir/${prefix_name}_nonTIRout > $outdir/${prefix_name}_nonTIR.bed
+make_bed_hmmOut.awk $outdir/${prefix_name}_TIRout > $outdir/${prefix_name}_TIR.bed
+bedtools getfasta -s -fi $wdir/1.data/$input_fasta -bed $outdir/${prefix_name}_nonTIR.bed -fo $outdir/${prefix_name}_nonTIR.fasta
+bedtools getfasta -s -fi $wdir/1.data/$input_fasta -bed $outdir/${prefix_name}_TIR.bed -fo $outdir/${prefix_name}_TIR.fasta
+cat $outdir/${prefix_name}_nonTIR.fasta $outdir/${prefix_name}_TIR.fasta > $outdir/${prefix_name}_NBARC.fasta
+seqkit rmdup -s $outdir/${prefix_name}_NBARC.fasta > $outdir/${prefix_name}_NBARC_nt.fasta
+
+##Step B - Use the following method to make *species-specific* NBARC hmms from Myrtaceae genome file using the previous output as training set. This awk script will extract first 200 (or designated numeral for variable NSEQS) sequences from previously output nonTIR and TIR.fasta. Then we combine these 400 sequences, remove duplicates and align with clustalo to make stockholm format for next steps of hmmer. This use of E.grandis HMM training set for *species-specific* HMM to extract NBS-LRR genes increases the output of NBARCs.
+
+NSEQS=200
+awk "/^>/ {n++} n>$NSEQS {exit} 1" $outdir/${prefix_name}_nonTIR.fasta > $outdir/${prefix_name}_nonTIR_200.fasta
+awk "/^>/ {n++} n>$NSEQS {exit} 1" $outdir/${prefix_name}_TIR.fasta > $outdir/${prefix_name}_TIR_200.fasta
+cat $outdir/${prefix_name}_nonTIR_200.fasta $outdir/${prefix_name}_TIR_200.fasta > $outdir/${prefix_name}_NBARC400.fasta
+seqkit rmdup -D duplicates -n $outdir/${prefix_name}_NBARC400.fasta > $outdir/${prefix_name}_NBARC.fasta #note overwrite of previous file
+clustalo -i  $outdir/${prefix_name}_NBARC.fasta -o  $outdir/${prefix_name}_NBARC.sto --outfmt=st
+hmmbuild -nucleic  $wdir/1.data/${prefix_name}.hmm  $outdir/${prefix_name}_NBARC.sto
+nhmmer $wdir/1.data/${prefix_name}.hmm $wdir/1.data/$input_fasta > $outdir/${prefix_name}_NBARCout
+make_bed_hmmOut.awk $outdir/${prefix_name}_NBARCout > $outdir/${prefix_name}_NBARC.bed
+bedtools getfasta -s -fi $wdir/1.data/$input_fasta -bed $outdir/${prefix_name}_NBARC.bed -fo $outdir/${prefix_name}_NBARC_nt.fasta #note overwrite of previous file
+
+##Step C - Translate Nucleotide NBARC sequences - 6-frame translations plus longest ORF frame output to fasta for downstream analysis.
+translate.py $outdir/${prefix_name}_NBARC_nt.fasta $outdir/${prefix_name}_NBARC_aa.fasta
+##Extract headers from NBARC_aa.fasta
+grep '^>' $outdir/${prefix_name}_NBARC_aa.fasta > $outdir/${prefix_name}_NBARC_headers.txt
+##Use the headers from the amino acid NBARC fasta to make an extended bedfile that incorporates +/- (1500nt) up and downstream of NBARC with python script so that the extended nucleotide fasta sequences can be extracted from original genome file. This can be used to identify other NLR type motifs such as TIR domains,LRR etc.
+headers_to_bed.py $outdir/${prefix_name}_NBARC_headers.txt 1500 $wdir/1.data/$input_fasta $outdir/${prefix_name}_NBARC_extend.bed
+bedtools getfasta -s -fi $wdir/1.data/$input_fasta -bed $outdir/${prefix_name}_NBARC_extend.bed -fo $outdir/${prefix_name}_NBARC_nt_extend.fasta
+
+##The following steps (Step D) are a bit problematic and should be revised somewhat or totally. Take the previous output and submit to interproscan to identify TIR, LRR coils etc For now it is best to map the extended fasta to the genome and get bam files to view in IGV.
+
+
+##Step D - Now translate this ${prefix_name}_NBARC_nt_extend.fasta using new script that does not end at stop codons - take this output and submit to interproscan to identify TIR, LRR coils etc.
+#translate_6fr.py $outdir/${prefix_name}_NBARC_nt_extend.fasta $outdir/${prefix_name}_NBARC_aa_extend.fasta
+##Extract all sequences that contain either GVGKT or GVGKS(string1)  AND LDD or MDD(string2).
+#exorf_or.py $outdir/${prefix_name}_aa_extend.fasta $wdir/0.scripts.logs/string1.txt $outdir/${prefix_name}_G_aa_extend.fasta
+#exorf_or.py  $outdir/${prefix_name}_NBARC_aa_extend.fasta $wdir/0.scripts.logs/string2.txt $outdir/${prefix_name}_NBARC_D_aa_extend.fasta
+##Extract headers from $outdir/${prefix_name}_NBARC_GandD_aa.fasta and make the nt fasta file of extended NBARCs with both Walker A and B motifs.
+#grep '^>' $outdir/${prefix_name}_NBARC_GandD_6fr_aa.fasta > $outir/${prefix_name}_NBARC_GandD_6fr_header.txt
+#headers_to_bed.py $outir/${prefix_name}_NBARC_GandD_header.txt 0 $wdir/1.data/E_grandis_UC.fasta $outir/${prefix_name}_NBARC_GandD.bed
+#bedtools getfasta -s -fi $wdir/1.data/$input_fasta -bed  $outir/${prefix_name}_NBARC_GandD.bed -fo  $outir/${prefix_name}_NBARC_GandD.nt.fasta
+
+##The NBARC_extended nt fasta and can now be mapped to the genome using bbmap mapPacBio.sh script (or for the NBARCnt.fasta with bbmap.sh). We can check locations from NLRannotator against this output.
+
+module unload seqkit/0.10.1
+module unload hmmer/3.3
+module unload bedtools/2.29.2
+module unload clustal-omega/1.2.4
+module unload python/3.6.5

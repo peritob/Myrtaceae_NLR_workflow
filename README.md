@@ -37,4 +37,8 @@ hmmbuild -nucleic Myrtaceae_species_NBARC.hmm clustalo-Myrtaceae_species_NBARC.s
 
 8. CC NBARC sequences with the canonical "W" tryptophan within the "LDD*W" (Pan et al. 2000) were identified (LDDVW = x, LDDLW = x, LDDIW = x, LDDTW = x, LDDAW = x, LDDMW = x). All sequences were aligned with 'n' E. grandis NBARC sequences, nonTIR and TIR using default parameters with clustalw. A neighbour-joining tree (using defaults, 1000 bootstraps) was constructed.
 
-9. Additional to the NBARC.fasta file, bedfiles were used to extract nt sequences 1500 upstream and downstream of the NBARCs. These fasta files were submitted to Pfam/Interproscan for annotation to identify putative TIR and LRR domains.
+9. Additional to the NBARC.fasta file, bedfiles were used to extract nt sequences 1500 upstream and downstream of the NBARCs. 
+
+10. These fasta files were run through braker2/2.0.6 to annotate predicted coding regions using Refseqs (aa or nt)from Supplemetary Data https://doi.org/10.1101/2020.07.08.193961
+
+11. Downstream analyses were then done including submitting outputs to Pfam/Interproscan for annotation.

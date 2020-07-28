@@ -6,10 +6,10 @@
 ### BLAST known resistance gene sequences against the Myrtaceae genome.
 ### Use the hidden Markov model workflow as described below.
 
-NB: Outputs all both approaches are still to be refined for a final dataset output.
+NB: Outputs all approaches are still to be refined for a final dataset output.
 
 
-1. hmmer/3.2 was used with the nhmmer function and DNA profile hidden markov models (EG_hmm) derived from *Eucalyptus grandis* alignments of the conserved nucleotide binding domain shared by Apaf-1, Resistance proteins and CED4 (NBARC) from coiled-coil (CC) NLR (here named nonTIR) and Toll interleukin-1 (TIR) NLR sequences. These EG_hmms were screened against the Myrtaceae_species_genome.fasta (where Myrtaceae_species refers to a species, for example Eucalyptus pauciflora). 
+1. hmmer/3.3 was used with the nhmmer function and DNA profile hidden markov models (EG_hmm) derived from *Eucalyptus grandis* alignments of the conserved nucleotide binding domain shared by Apaf-1, Resistance proteins and CED4 (NBARC) from coiled-coil (CC) NLR (here named nonTIR) and Toll interleukin-1 (TIR) NLR sequences. These EG_hmms were screened against the Myrtaceae_species_genome.fasta (where Myrtaceae_species refers to a species, for example Eucalyptus pauciflora). 
 
 ```
 nhmmer EG_nonTIRhmm Myrtaceae_species_genome.fasta >Myrtaceae_species_nonTIRout
@@ -18,7 +18,7 @@ nhmmer EG_TIRhmm Myrtaceae_species_genome.fasta >Myrtaceae_species_TIRout
 
 2. bed formatted files were created with the identified sequences (in the default hmmer inclusion list) in Myrtaceae_species_genome.fasta.
 
-3. bedtools/2.25.0 was used to extract sequences from genome.
+3. bedtools/2.29.2 was used to extract sequences from genome.
 
 ```
 bedtools getfasta -s -fi Myrtaceae_species_genome.fasta -bed Myrtaceae_speciesTIR.bed -fo Myrtaceae_species_genome.TIR.fasta

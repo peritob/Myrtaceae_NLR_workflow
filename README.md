@@ -33,12 +33,16 @@ hmmbuild -nucleic Myrtaceae_species_NBARC.hmm clustalo-Myrtaceae_species_NBARC.s
 
 5. Step 1,2 and 3 from the species-specific HMM extracted stranded NBARC sequences from the genome. NB. Headers for the extracted fasta have (+) for forward strand and (-) for reverse for the location on the scaffold specified.  
 
-6. Nucleotide NBARC sequences were 6-frame translated using an adapted Bioseq script and the longest ORF frame output to fasta for downstream analysis. Total sequences from this set, containing the Walker A "GKT" **or** "GKS" **and** Walker B "LDD" **or** "MDD" strings of amino acids were extracted. **Note - NBARCs should be retained if both 'GKT/S' and 'M/LDD' strings are present.** 
+6. Nucleotide NBARC sequences were 6-frame translated using an adapted Bioseq script and the longest ORF frame output to fasta for downstream analysis. 
 
-8. CC NBARC sequences with the canonical "W" tryptophan within the "LDD*W" (Pan et al. 2000) were identified (LDDVW = x, LDDLW = x, LDDIW = x, LDDTW = x, LDDAW = x, LDDMW = x). All sequences were aligned with 'n' E. grandis NBARC sequences, nonTIR and TIR using default parameters with clustalw. A neighbour-joining tree (using defaults, 1000 bootstraps) was constructed.
+7. Headers from the NBARC_aa.fasta file were extracted and bedfiles created to extract nt sequences 20kb upstream and downstream of the NBARCs from orginal genome.fasta. Bedtools merge was used to join overlapping or abutting sequences. The subsequent fasta files were manually altered to remove the brackets in headers, for example Chr01:1-40000(+) changed to Chr01:1-40000+ so that they are suitable for braker2 annotations.
 
-9. Additional to the NBARC.fasta file, bedfiles were used to extract nt sequences 1500 upstream and downstream of the NBARCs. 
+8. These fasta files were run through braker2/2.1.5 to annotate predicted coding regions using NLR Refseqs (aa)from Supplemetary Data https://doi.org/10.1101/2020.07.08.193961 as hints in --epmode.
 
-10. These fasta files were run through braker2/2.0.6 to annotate predicted coding regions using Refseqs (aa or nt)from Supplemetary Data https://doi.org/10.1101/2020.07.08.193961
+```
+braker.pl --cores=15 --genome=/scratch/myrtaceae/1.data/E_grandis_NBARC_20kbflanking.fasta --prot_seq=/scratch/myrtaceae/1.data/RefPlantNLR_aa.fa --ALIGNMENT_TOOL_PATH=/usr/local/genemark-es/4.59/ProtHint/bin/ --prg=ph --epmode --species=E_grandis --gff3
+```
 
-11. Downstream analyses were then done including submitting outputs to Pfam/Interproscan for annotation.
+9. Downstream analyses were then done including submitting outputs to Pfam/Interproscan for annotation.
+
+10. (This step in revision: Total sequences from this set, containing the Walker A "GKT" **or** "GKS" **and** Walker B "LDD" **or** "MDD" strings of amino acids were extracted. **Note - NBARCs should be retained if both 'GKT/S' and 'M/LDD' strings are present.** CC NBARC sequences with the canonical "W" tryptophan within the "LDD*W" (Pan et al. 2000) were identified (LDDVW = x, LDDLW = x, LDDIW = x, LDDTW = x, LDDAW = x, LDDMW = x). All sequences were aligned with 'n' E. grandis NBARC sequences, nonTIR and TIR using default parameters with clustalw. A neighbour-joining tree (using defaults, 1000 bootstraps) was constructed.)

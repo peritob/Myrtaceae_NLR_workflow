@@ -12,7 +12,7 @@
 wdir=/scratch/myrtaceae
 outdir=$wdir/2.results
 
-# Load modules
+#Load modules
 module load hmmer/3.3
 module load bedtools/2.29.2
 module load seqkit/0.10.1
@@ -34,8 +34,6 @@ make_bed_hmmOut.awk $outdir/${prefix_name}_nonTIRout > $outdir/${prefix_name}_no
 make_bed_hmmOut.awk $outdir/${prefix_name}_TIRout > $outdir/${prefix_name}_TIR.bed
 bedtools getfasta -s -fi $wdir/1.data/$input_fasta -bed $outdir/${prefix_name}_nonTIR.bed -fo $outdir/${prefix_name}_nonTIR.fasta
 bedtools getfasta -s -fi $wdir/1.data/$input_fasta -bed $outdir/${prefix_name}_TIR.bed -fo $outdir/${prefix_name}_TIR.fasta
-cat $outdir/${prefix_name}_nonTIR.fasta $outdir/${prefix_name}_TIR.fasta > $outdir/${prefix_name}_NBARC.fasta
-seqkit rmdup -s $outdir/${prefix_name}_NBARC.fasta > $outdir/${prefix_name}_NBARC_nt.fasta
 
 ##Step B - Use the following method to make *species-specific* NBARC hmms from Myrtaceae genome file using the previous output as training set.
 
@@ -44,27 +42,31 @@ NSEQS=200
 awk "/^>/ {n++} n>$NSEQS {exit} 1" $outdir/${prefix_name}_nonTIR.fasta > $outdir/${prefix_name}_nonTIR_200.fasta
 awk "/^>/ {n++} n>$NSEQS {exit} 1" $outdir/${prefix_name}_TIR.fasta > $outdir/${prefix_name}_TIR_200.fasta
 cat $outdir/${prefix_name}_nonTIR_200.fasta $outdir/${prefix_name}_TIR_200.fasta > $outdir/${prefix_name}_NBARC400.fasta
-seqkit rmdup -D duplicates -n $outdir/${prefix_name}_NBARC400.fasta > $outdir/${prefix_name}_NBARC.fasta #note overwrite of previous file
+seqkit rmdup -D duplicates -n $outdir/${prefix_name}_NBARC400.fasta > $outdir/${prefix_name}_NBARC.fasta
 clustalo -i  $outdir/${prefix_name}_NBARC.fasta -o  $outdir/${prefix_name}_NBARC.sto --outfmt=st
 hmmbuild -nucleic  $wdir/1.data/${prefix_name}.hmm  $outdir/${prefix_name}_NBARC.sto
 nhmmer $wdir/1.data/${prefix_name}.hmm $wdir/1.data/$input_fasta > $outdir/${prefix_name}_NBARCout
 make_bed_hmmOut.awk $outdir/${prefix_name}_NBARCout > $outdir/${prefix_name}_NBARC.bed
-bedtools getfasta -s -fi $wdir/1.data/$input_fasta -bed $outdir/${prefix_name}_NBARC.bed -fo $outdir/${prefix_name}_NBARC_nt.fasta #note overwrite of previous file
+bedtools getfasta -s -fi $wdir/1.data/$input_fasta -bed $outdir/${prefix_name}_NBARC.bed -fo $outdir/${prefix_name}_NBARC_nt.fasta
 
 ##Step C - Translate Nucleotide NBARC sequences - 6-frame translations plus longest ORF frame output to fasta for downstream analysis, including extracting extended regions aroun NBARC domains from original genome.
 translate.py $outdir/${prefix_name}_NBARC_nt.fasta $outdir/${prefix_name}_NBARC_aa.fasta
 ##Extract headers from NBARC_aa.fasta
 grep '^>' $outdir/${prefix_name}_NBARC_aa.fasta > $outdir/${prefix_name}_NBARC_headers.txt
-##Use the headers from the amino acid NBARC fasta to make an extended bedfile that incorporates +/- (1500nt) up and downstream of NBARC with python script so that the extended nucleotide fasta sequences can be extracted from original genome file. This can be used to identify other NLR type motifs such as TIR domains,LRR etc.
-headers_to_bed.py $outdir/${prefix_name}_NBARC_headers.txt 1500 $wdir/1.data/$input_fasta $outdir/${prefix_name}_NBARC_extend.bed
-bedtools getfasta -s -fi $wdir/1.data/$input_fasta -bed $outdir/${prefix_name}_NBARC_extend.bed -fo $outdir/${prefix_name}_NBARC_nt_extend.fasta
+##Use the headers from the amino acid NBARC fasta to make an extended bedfile that incorporates +/- (2000nt) up and downstream of NBARC with python script so that the extended nucleotide fasta sequences can be extracted from original genome file. This can be used to identify other NLR type motifs such as TIR domains,LRR etc.
+headers_to_bed.py $outdir/${prefix_name}_NBARC_headers.txt 20000 $wdir/1.data/$input_fasta $outdir/${prefix_name}_NBARC_20kbflanking.bed
+#bedtools merge requires that you presort your data by chromosome and then by start position, as below.
+sort -k1,1 -k2,2n $outdir/${prefix_name}_NBARC_20kbflanking.bed > $outdir/${prefix_name}_NBARC_20kbflanking_sort.bed
+bedtools merge -s -d 1 -c 5,4,6 -o count,distinct,last -i $outdir/${prefix_name}_NBARC_20kbflanking_sort.bed > $outdir/${prefix_name}_NBARC_20kbflanking_merge.bed
+bedtools getfasta -s -fi $wdir/1.data/$input_fasta -bed $outdir/${prefix_name}_NBARC_20kbflanking_merge.bed -fo $outdir/${prefix_name}_NBARC_20kbflanking.fasta
+#To identify clusters based on the bedtools merge just sort the data numerically by cluster column
+sort -nrk4,4 E_grandis_NBARC_20kbflanking_merge.bed > E_grandis_NBARC_20kbflanking_clustersort.bed
 
-##The following steps (Step D) are a bit problematic and should be revised somewhat or totally. Take the previous output and submit to interproscan to identify TIR, LRR coils etc For now it is best to map the extended fasta to the genome and get bam files to view in IGV.
+##Step D - Take the previous output and annotate with Kamoun Refset_aa.fasta using braker2 in --epmode. Then remove the * from the amino acid augusutus output and scan with interproscan-5 to identify TIR, LRR coils etc. for a complete list and fasta outptut of NLR putative genes. Interproscan will also identify other important domains within prximity to NLRs, such as TE-like domains. These could be investigated further.
 
+##Step E - still being revised
 
-##Step D - Now translate this ${prefix_name}_NBARC_nt_extend.fasta using new script that does not end at stop codons - take this output and submit to interproscan to identify TIR, LRR coils etc.
-#translate_6fr.py $outdir/${prefix_name}_NBARC_nt_extend.fasta $outdir/${prefix_name}_NBARC_aa_extend.fasta
-##Extract all sequences that contain either GVGKT or GVGKS(string1)  AND LDD or MDD(string2).
+##Extract all sequences that contain either GVGKT or GVGKS(string1) AND LDD or MDD(string2).
 #exorf_or.py $outdir/${prefix_name}_aa_extend.fasta $wdir/0.scripts.logs/string1.txt $outdir/${prefix_name}_G_aa_extend.fasta
 #exorf_or.py  $outdir/${prefix_name}_NBARC_aa_extend.fasta $wdir/0.scripts.logs/string2.txt $outdir/${prefix_name}_NBARC_D_aa_extend.fasta
 ##Extract headers from $outdir/${prefix_name}_NBARC_GandD_aa.fasta and make the nt fasta file of extended NBARCs with both Walker A and B motifs.
@@ -72,7 +74,7 @@ bedtools getfasta -s -fi $wdir/1.data/$input_fasta -bed $outdir/${prefix_name}_N
 #headers_to_bed.py $outir/${prefix_name}_NBARC_GandD_header.txt 0 $wdir/1.data/E_grandis_UC.fasta $outir/${prefix_name}_NBARC_GandD.bed
 #bedtools getfasta -s -fi $wdir/1.data/$input_fasta -bed  $outir/${prefix_name}_NBARC_GandD.bed -fo  $outir/${prefix_name}_NBARC_GandD.nt.fasta
 
-##The NBARC_extended nt fasta and can now be mapped to the genome using bbmap mapPacBio.sh script (or for the NBARCnt.fasta with bbmap.sh). We can check locations from NLRannotator against this output.
+##The identified coding sequences of NLRs can now be mapped to the genome using bbmap mapPacBio.sh script (or for just the NBARCnt.fasta with bbmap.sh). We can check locations from NLRannotator against this output.
 
 module unload seqkit/0.10.1
 module unload hmmer/3.3

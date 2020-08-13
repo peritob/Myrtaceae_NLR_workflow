@@ -1,0 +1,47 @@
+#!/bin/bash
+#PBS -P myrtaceae
+#PBS -N braker
+#PBS -l select=1:ncpus=15:mem=10GB
+#PBS -l walltime=5:00:00
+#PBS -e ./braker_eror.txt
+#PBS -o ./braker_output.txt
+#PBS -M peri.tobias@sydney.edu.au
+#PBS -m abe
+
+#Load modules
+module load braker2/2.1.5
+module load genemark-es/4.59
+module load augustus/3.3.3
+module load bamtools/2.5.1
+module load python/3.6.5
+module load samtools/1.9
+module load genomethreader/1.7.1
+module load exonerate/2.2.0
+module load eval/2.2.8
+module load makehub/i
+module load blast+/2.7.1
+module load cdbfasta/1.00
+module load diamond/0.9.32
+
+cd $PBS_O_WORKDIR
+export AUGUSTUS_CONFIG_PATH="/home/ptob6302/augustus/config/"
+export AUGUSTUS_BIN_PATH="/usr/local/augustus/3.3.3/bin"
+export AUGUSTUS_SCRIPTS_PATH="/usr/local/augustus/3.3.3/scripts"
+
+#run braker script to annotate the predicted NLR genes using downloaded resistance proteins file as hints. Before starting this script make sure the fasta headers do not have special characters. ie. remove () from bedtools fasta output. Do not softmask the NBARC.fasta.
+braker.pl --cores=15 --genome=/scratch/myrtaceae/1.data/E_grandis_NBARC_20kbflanking.fasta --prot_seq=/scratch/myrtaceae/1.data/RefPlantNLR_aa.fa --ALIGNMENT_TOOL_PATH=/usr/local/genemark-es/4.59/ProtHint/bin/ --prg=ph --epmode --species=E_grandis --gff3
+
+module unload braker2/2.1.5
+module unload genemark-es/4.59
+module unload augustus/3.3.3
+module unload bamtools/2.5.1
+module unload python/3.6.5
+module unload samtools/1.9
+module unload genomethreader/1.7.1
+module unload exonerate/2.2.0
+module unload eval/2.2.8
+module unload makehub/i
+module unload blast+/2.7.1
+module unload cdbfasta/1.00
+module unload diamond/0.9.32
+

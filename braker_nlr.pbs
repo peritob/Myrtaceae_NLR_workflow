@@ -28,8 +28,9 @@ export AUGUSTUS_CONFIG_PATH="/home/ptob6302/augustus/config/"
 export AUGUSTUS_BIN_PATH="/usr/local/augustus/3.3.3/bin"
 export AUGUSTUS_SCRIPTS_PATH="/usr/local/augustus/3.3.3/scripts"
 
-#run braker script to annotate the predicted NLR genes using downloaded resistance proteins file as hints. Before starting this script make sure the fasta headers do not have special characters. ie. remove () from bedtools fasta output. Do not softmask the NBARC.fasta.
-braker.pl --cores=15 --genome=/scratch/myrtaceae/1.data/E_grandis_NBARC_20kbflanking.fasta --prot_seq=/scratch/myrtaceae/1.data/RefPlantNLR_aa.fa --ALIGNMENT_TOOL_PATH=/usr/local/genemark-es/4.59/ProtHint/bin/ --prg=ph --epmode --species=E_grandis --gff3
+#Run braker script to annotate the predicted NLR genes including 20kbflanking (for example, E_grandis_NBARC_20kbflanking.fasta) using downloaded resistance proteins file as hints. Before starting this script make sure the fasta headers do not have special characters. ie. remove () from bedtools fasta output. Do not softmask the NBARC.fasta. Initiate job schedule with "qsub -v input_fasta=E_grandis_NBARC_20kbflanking.fasta,input_species=E_grandis braker_nlr.pbs
+
+braker.pl --cores=15 --genome=$wdir/1.data/$input_fasta --prot_seq=$wdir/1.data/RefPlantNLR_aa.fa --ALIGNMENT_TOOL_PATH=/usr/local/genemark-es/4.59/ProtHint/bin/ --prg=ph --epmode --species=$input_species --gff3
 
 module unload braker2/2.1.5
 module unload genemark-es/4.59

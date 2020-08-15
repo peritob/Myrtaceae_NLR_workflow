@@ -1,0 +1,39 @@
+1. Combine the haplotig upper case fasta files, for example: cat E_grandis_hap.fasta E_grandis.fasta > E_grandis_combined.fasta
+2. Run HMM script and obtain the 20kbflanking_NBARC.fasta.
+3. Annotate with braker2
+4. Interproscan5 domains identified for annotated 'genes'.
+
+How do we map these back?
+We have the 40kb locations in bed format.
+We have the braker output locations within the 40kb regions in gff3 and gene number ids.
+Can we give the gene number a location value based on above data first? Then domain locations mapped to gene id from interproscan output.
+For example this gff3 from braker:
+
+Chr07:29972544-30013308+	AUGUSTUS	gene	1	770	0.82	-	.	ID=g1;
+Chr07:29972544-30013308+	AUGUSTUS	mRNA	1	770	0.82	-	.	ID=g1.t1;Parent=g1;
+Chr07:29972544-30013308+	AUGUSTUS	intron	1	225	0.91	-	.	ID=g1.t1.intron1;Parent=g1.t1;
+Chr07:29972544-30013308+	AUGUSTUS	CDS	226	770	0.82	-	0	ID=g1.t1.CDS1;Parent=g1.t1;
+Chr07:29972544-30013308+	AUGUSTUS	exon	226	770	.	-	.	ID=g1.t1.exon1;Parent=g1.t1;
+Chr07:29972544-30013308+	AUGUSTUS	start_codon	768	770	.	-	0	ID=g1.t1.start1;Parent=g1.t1;
+
+plus this gff3 from interproscan:
+##sequence-region g1.t1 1 182
+g1.t1	.	polypeptide	1	182	.	+	.	ID=g1.t1;md5=9702bd64172615c1fb5c3a1f5d2d944c
+g1.t1	SUPERFAMILY	protein_match	2	93	4.05E-27	+	.	date=10-08-2020;Target=g1.t1 2 93;ID=match$12956_2_93;Name=SSF53098;status=T;Dbxref="InterPro:IPR012337"
+
+
+another option
+
+use coding sequences with interproscan
+match gff3 output with braker gff3
+
+column 1 has the region on chromosome and strand
+column 2 irrelevant
+column 3 description of gene character
+column 4 start position
+column 5 end position
+
+E_grandis.nLR.aa.fasta.gff3 file has all one to many data outputs.
+augustus.hints.gff3 has parent-child data related to gene id.
+
+These two data files can be matched by gene id and location. E_grandis.nLR.aa.fasta.gff3 locations are amino acid and therefore need to be x 3 to match coding sequences in augustus.hints file.

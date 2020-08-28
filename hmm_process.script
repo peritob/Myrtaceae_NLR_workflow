@@ -64,7 +64,9 @@ sort -nrk4,4 E_grandis_NBARC_20kbflanking_merge.bed > E_grandis_NBARC_20kbflanki
 
 ##Step D - Take the previous output and annotate with Kamoun Refset_aa.fasta using braker2 in --epmode. Then remove the * from the amino acid augusutus output and scan with interproscan-5 to identify TIR, LRR coils etc. for a complete list and fasta outptut of NLR putative genes. Interproscan will also identify other important domains within prximity to NLRs, such as TE-like domains. These could be investigated further.
 
-##Step E - still being revised
+#Step E - The output from interproscan needs to be correlated with the augustus.gff3 and to the original genome co-ordinates. 
+
+##Step F - still being revised
 
 ##Extract all sequences that contain either GVGKT or GVGKS(string1) AND LDD or MDD(string2).
 #exorf_or.py $outdir/${prefix_name}_aa_extend.fasta $wdir/0.scripts.logs/string1.txt $outdir/${prefix_name}_G_aa_extend.fasta
@@ -74,7 +76,6 @@ sort -nrk4,4 E_grandis_NBARC_20kbflanking_merge.bed > E_grandis_NBARC_20kbflanki
 #headers_to_bed.py $outir/${prefix_name}_NBARC_GandD_header.txt 0 $wdir/1.data/E_grandis_UC.fasta $outir/${prefix_name}_NBARC_GandD.bed
 #bedtools getfasta -s -fi $wdir/1.data/$input_fasta -bed  $outir/${prefix_name}_NBARC_GandD.bed -fo  $outir/${prefix_name}_NBARC_GandD.nt.fasta
 
-##The identified coding sequences of NLRs can now be mapped to the genome using bbmap mapPacBio.sh script (or for just the NBARCnt.fasta with bbmap.sh). We can check locations from NLRannotator against this output.
 
 module unload seqkit/0.10.1
 module unload hmmer/3.3

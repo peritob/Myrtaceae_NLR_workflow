@@ -8,6 +8,10 @@
 #PBS -M peri.tobias@sydney.edu.au
 #PBS -m abe
 
+#Parameters
+wdir=/scratch/myrtaceae
+outdir=$wdir/2.results
+
 #Load modules
 module load braker2/2.1.5
 module load genemark-es/4.59
@@ -24,13 +28,17 @@ module load cdbfasta/1.00
 module load diamond/0.9.32
 
 cd $PBS_O_WORKDIR
-export AUGUSTUS_CONFIG_PATH="/home/ptob6302/augustus/config/"
+export AUGUSTUS_CONFIG_PATH="/home/ptob6302/augustus/config/" 
 export AUGUSTUS_BIN_PATH="/usr/local/augustus/3.3.3/bin"
 export AUGUSTUS_SCRIPTS_PATH="/usr/local/augustus/3.3.3/scripts"
 
-#Run braker script to annotate the predicted NLR genes including 20kbflanking (for example, E_grandis_NBARC_20kbflanking.fasta) using downloaded resistance proteins file as hints. Before starting this script make sure the fasta headers do not have special characters. ie. remove () from bedtools fasta output. Do not softmask the NBARC.fasta. Initiate job schedule with "qsub -v input_fasta=E_grandis_NBARC_20kbflanking.fasta,input_species=E_grandis braker_nlr.pbs
-
-braker.pl --cores=15 --genome=$wdir/1.data/$input_fasta --prot_seq=$wdir/1.data/RefPlantNLR_aa.fa --ALIGNMENT_TOOL_PATH=/usr/local/genemark-es/4.59/ProtHint/bin/ --prg=ph --epmode --species=$input_species --gff3
+#run braker script to annotate the predicted NLR genes using downloaded resistance proteins file as hints. Before starting this script make sure the fasta headers do not have special characters. ie. remove () from bedtools fasta output. Do not softmask the NBARC_20kbflanking.fasta.
+braker.pl --cores=15 --genome=$wdir/1.data/$input_fasta --prot_seq=$wdir/1.data/RefPlantNLR_aa.fa --ALIGNMENT_TOOL_PATH=/usr/local/genemark-es/4.59/ProtHint/bin/ --prg=ph --epmode --species=$input_species
+/usr/local/augustus/3.3.3/scripts/gtf2gff.pl <$wdir/0.scripts.logs/braker/augustus.hints.gtf --printExon --out=$wdir/0.scripts.logs/braker/augustus.gff3 --gff3  
+mv $wdir/0.scripts.logs/braker/augustus.hints.gtf $wdir/2.results/${prefix_name}_augustus.gtf
+mv $wdir/0.scripts.logs/braker/augustus.gff3 $wdir/2.results/${prefix_name}_augustus.gff3
+mv $wdir/0.scripts.logs/braker/augustus.hints.codingseq $wdir/1.data/${prefix_name}_augustus_cds.fasta
+sed s/*//g $wdir/0.scripts.logs/braker/augustus.hints.aa > $wdir/1.data/${prefix_name}_augustus_aa.fasta
 
 module unload braker2/2.1.5
 module unload genemark-es/4.59

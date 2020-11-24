@@ -19,7 +19,7 @@ module load seqkit/0.10.1
 module load clustal-omega/1.2.4
 module load python/3.6.5
 
-##Also all additional scripts in home directory or path specified. This script will run through all the steps and output an exended nt fasta for NBARC regions in genome plus an amino acid fasta for the NBARC regions. Scripts in wdir/0.scripts/ Genome.fasta and HMMs in wdir/1.data/ and all outputs to wdir/2.results.
+##Also all additional scripts in home directory or path specified. This script will run through all the steps and output an exended nt fasta for NBARC regions in genome plus an amino acid fasta for the NBARC regions. Scripts in wdir/0.scripts/ Genome.fasta, NLR-annotator bedfile and HMMs in wdir/1.data/ and all outputs to wdir/2.results.
 
 ##We pass the genome and prefix for outputs when submitting the pbs script, for example: qsub -v prefix_name=E_grandis,input_fasta=E_grandis.fasta myrtaceae_hmm.pbs
 
@@ -49,33 +49,24 @@ nhmmer $wdir/1.data/${prefix_name}.hmm $wdir/1.data/$input_fasta > $outdir/${pre
 make_bed_hmmOut.awk $outdir/${prefix_name}_NBARCout > $outdir/${prefix_name}_NBARC.bed
 bedtools getfasta -s -fi $wdir/1.data/$input_fasta -bed $outdir/${prefix_name}_NBARC.bed -fo $outdir/${prefix_name}_NBARC_nt.fasta
 
-##Step C - Translate Nucleotide NBARC sequences - 6-frame translations plus longest ORF frame output to fasta for downstream analysis, including extracting extended regions aroun NBARC domains from original genome.
+##Step C - Translate Nucleotide NBARC sequences - 6-frame translations plus longest ORF frame output to fasta for downstream analysis, including extracting extended regions around NBARC domains from original genome and incorporating NLR-annotator defined loci.
 translate.py $outdir/${prefix_name}_NBARC_nt.fasta $outdir/${prefix_name}_NBARC_aa.fasta
 ##Extract headers from NBARC_aa.fasta
 grep '^>' $outdir/${prefix_name}_NBARC_aa.fasta > $outdir/${prefix_name}_NBARC_headers.txt
-##Use the headers from the amino acid NBARC fasta to make an extended bedfile that incorporates +/- (2000nt) up and downstream of NBARC with python script so that the extended nucleotide fasta sequences can be extracted from original genome file. This can be used to identify other NLR type motifs such as TIR domains,LRR etc.
+##Use the headers from the amino acid NBARC fasta to make an extended bedfile that incorporates +/- (20,000 nt) up and downstream of NBARC with python script so that the extended nucleotide fasta sequences can be extracted from original genome file. This can be used to identify other NLR type motifs such as TIR domains,LRR etc.
 headers_to_bed.py $outdir/${prefix_name}_NBARC_headers.txt 20000 $wdir/1.data/$input_fasta $outdir/${prefix_name}_NBARC_20kbflanking.bed
 #bedtools merge requires that you presort your data by chromosome and then by start position, as below.
 sort -k1,1 -k2,2n $outdir/${prefix_name}_NBARC_20kbflanking.bed > $outdir/${prefix_name}_NBARC_20kbflanking_sort.bed
-bedtools merge -s -d 1 -c 5,4,6 -o count,distinct,last -i $outdir/${prefix_name}_NBARC_20kbflanking_sort.bed > $outdir/${prefix_name}_NBARC_20kbflanking_merge.bed
-bedtools getfasta -s -fi $wdir/1.data/$input_fasta -bed $outdir/${prefix_name}_NBARC_20kbflanking_merge.bed -fo $outdir/${prefix_name}_NBARC_20kbflanking.fasta
-#To identify clusters based on the bedtools merge just sort the data numerically by cluster column
-sort -nrk4,4 E_grandis_NBARC_20kbflanking_merge.bed > E_grandis_NBARC_20kbflanking_clustersort.bed
+#At this point we can incorporate the data output from nlr-annotator. To do this we need to standardise the bed file from nlr-annotator to match column data with ${prefix_name}_NBARC_20kbflanking_sort.bed. We then combine files and merge
+gawk 'BEGIN { OFS = "\t"} ; { col5 = ($6 == "+" ? "forward" : "reverse");  print $1, $2, $3, $1, col5, $6 }' $wdir/1.data/${prefix_name}_nlr.bed > $outdir/${prefix_name}_new_nlr.bed
+sort -k1,1 -k2,2n $outdir/${prefix_name}_new_nlr.bed > $outdir/${prefix_name}_new_sort_nlr.bed
+cat $outdir/${prefix_name}_NBARC_20kbflanking_sort.bed $outdir/${prefix_name}_new_sort_nlr.bed > $outdir/${prefix_name}_NBARC_20kb.bed
+bedtools merge -s -d 1 -c 5,4,6 -o count,distinct,last -i $outdir/${prefix_name}_NBARC_20kb.bed > $outdir/${prefix_name}_NBARC_20kb_merge.bed
+bedtools getfasta -s -fi $wdir/1.data/$input_fasta -bed $outdir/${prefix_name}_NBARC_20kb_merge.bed -fo $outdir/${prefix_name}_NBARC_20kb.fasta
 
-##Step D - Take the previous output and annotate with Kamoun Refset_aa.fasta using braker2 in --epmode. Then remove the * from the amino acid augusutus output and scan with interproscan-5 to identify TIR, LRR coils etc. for a complete list and fasta outptut of NLR putative genes. Interproscan will also identify other important domains within prximity to NLRs, such as TE-like domains. These could be investigated further.
+##Step D - Take the previous output ($outdir/${prefix_name}_NBARC_20kb.fasta)  and annotate with Supplemetary Data https://doi.org/10.1101/2020.07.08.193961 (NLR Refseqs aa) as hints in --epmode. Then remove the * from the amino acid augusutus output and scan with interproscan-5 to identify TIR, LRR coils etc. for a complete list and fasta outptut of NLR putative genes. Interproscan will also identify other important domains within proximity to NLRs.
 
-#Step E - The output from interproscan needs to be correlated with the augustus.gff3 and to the original genome co-ordinates. 
-
-##Step F - still being revised
-
-##Extract all sequences that contain either GVGKT or GVGKS(string1) AND LDD or MDD(string2).
-#exorf_or.py $outdir/${prefix_name}_aa_extend.fasta $wdir/0.scripts.logs/string1.txt $outdir/${prefix_name}_G_aa_extend.fasta
-#exorf_or.py  $outdir/${prefix_name}_NBARC_aa_extend.fasta $wdir/0.scripts.logs/string2.txt $outdir/${prefix_name}_NBARC_D_aa_extend.fasta
-##Extract headers from $outdir/${prefix_name}_NBARC_GandD_aa.fasta and make the nt fasta file of extended NBARCs with both Walker A and B motifs.
-#grep '^>' $outdir/${prefix_name}_NBARC_GandD_6fr_aa.fasta > $outir/${prefix_name}_NBARC_GandD_6fr_header.txt
-#headers_to_bed.py $outir/${prefix_name}_NBARC_GandD_header.txt 0 $wdir/1.data/E_grandis_UC.fasta $outir/${prefix_name}_NBARC_GandD.bed
-#bedtools getfasta -s -fi $wdir/1.data/$input_fasta -bed  $outir/${prefix_name}_NBARC_GandD.bed -fo  $outir/${prefix_name}_NBARC_GandD.nt.fasta
-
+##Step E - The output from interproscan needs to be correlated with the augustus.gff3 and to the original genome co-ordinates. Scripts for extracting the gene IDs and chromosome locations as gff3 files are: run_NBARC.sh, run_NBLRR.sh
 
 module unload seqkit/0.10.1
 module unload hmmer/3.3

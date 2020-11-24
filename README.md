@@ -48,6 +48,18 @@ braker.pl --cores=15 --genome=/scratch/myrtaceae/1.data/E_grandis_NBARC_20kbflan
 interproscan.sh -t p -appl Pfam,COILS,Gene3D -i $wdir/1.data/$input_fasta -f tsv,gff3 -d $outdir/
 ```
 
-10. Annotated NB-LRR genes identified and chromosomal locations clarified against augustus_out.gff3 using scripts; run_NBARC.sh, run_NBLRR.sh
+10. Annotated NB-LRR genes identified and chromosomal locations clarified against augustus_out.gff3 using scripts for these identifiers:
+PF00931 = NB-ARC domain
+PF08263 = LRR
+PF12799 = LRR
+PF13306 = LRR
+PF13855 = LRR
+PF13516 = LRR
+Also need to search for this Gene3D output in interproscan because Pfam does not recognise all LRR signals.
+G3DSA:1.10.8.430 = Gene3D LRR
+
+Look also for TIR domains, Coils etc.
+PF01582 = TIR
+The scripts to do this are: run_NBARC.sh, run_NBLRR.sh
 
 

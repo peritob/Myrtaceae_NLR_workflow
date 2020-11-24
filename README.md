@@ -34,7 +34,7 @@ hmmbuild -nucleic Myrtaceae_species_NBARC.hmm clustalo-Myrtaceae_species_NBARC.s
 
 6. Nucleotide NBARC sequences were 6-frame translated using an adapted Bioseq script and the longest ORF frame output to fasta for downstream analysis. 
 
-7. Headers from the NBARC_aa.fasta file were extracted and bedfiles created, concatenated to reformatted nlr-annotator bed files to extract nt sequences 20kb upstream and downstream of the NBARCs from orginal genome.fasta. Bedtools merge was used to join overlapping or abutting sequences. The subsequent fasta files were adjusted to remove the brackets in headers, for example Chr01:1-40000(+) changed to Chr01:1-40000+ so that they are suitable for braker2 annotations.
+7. Headers from the NBARC_aa.fasta file were extracted and bedfiles created. nlr-annotator output bed files were reformatted to conform with hmm bed files. Both bed files were joined and sorted. Bedtools merge was used to join overlapping or abutting sequences and the subsequent bed file was used to extract nt sequences 20kb upstream and downstream of the NBARCs from Myrtaceae_species_genome.fasta. The NBARC fasta files were adjusted to remove the brackets in headers, for example Chr01:1-40000(+) changed to Chr01:1-40000+ so that they are suitable for braker2 annotations.
 
 8. These fasta files were run through braker2/2.1.5 to annotate predicted coding regions using NLR Refseqs (aa) from Supplemetary Data https://doi.org/10.1101/2020.07.08.193961 as hints in --epmode.
 

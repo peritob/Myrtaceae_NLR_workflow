@@ -52,6 +52,7 @@ interproscan.sh -t p -appl Pfam,COILS,Gene3D -i $wdir/1.data/$input_fasta -f tsv
 with these identifiers.
 
 * PF00931 = NB-ARC domain
+* G3DSA:3.40.50.300 = P-loop containing nucleoside triphosphate hydrolase
 * PF08263 = LRR
 * PF12799 = LRR
 * PF13306 = LRR

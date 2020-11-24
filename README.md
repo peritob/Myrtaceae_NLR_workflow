@@ -2,8 +2,8 @@
 
 **These are the steps involved in identifying the NBS-LRR (NLR) complement across the Myrtaceae family.**
 
-### Use NLR-annotator https://doi.org/10.1104/pp.19.01273 as an initial approach.
-### Use the hidden Markov model workflow as described below.
+#### Use NLR-annotator https://doi.org/10.1104/pp.19.01273 as an initial approach.
+#### Use the hidden Markov model workflow as described below.
 
 NB: The process is fully documented in hmm_process.script
 

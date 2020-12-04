@@ -33,6 +33,9 @@ export AUGUSTUS_BIN_PATH="/usr/local/augustus/3.3.3/bin"
 export AUGUSTUS_SCRIPTS_PATH="/usr/local/augustus/3.3.3/scripts"
 
 #run braker script to annotate the predicted NLR genes using downloaded resistance proteins file as hints. Before starting this script make sure the fasta headers do not have special characters. ie. remove () from bedtools fasta output. Do not softmask the NBARC_20kbflanking.fasta.
+
+#to run this script in pbs-pro: qsub -v input_fasta=species_genome.fasta,input_species=species_name braker_nlr.pbs 
+
 braker.pl --cores=15 --genome=$wdir/1.data/$input_fasta --prot_seq=$wdir/1.data/RefPlantNLR_aa.fa --ALIGNMENT_TOOL_PATH=/usr/local/genemark-es/4.59/ProtHint/bin/ --prg=ph --epmode --species=$input_species
 /usr/local/augustus/3.3.3/scripts/gtf2gff.pl <$wdir/0.scripts.logs/braker/augustus.hints.gtf --printExon --out=$wdir/0.scripts.logs/braker/augustus.gff3 --gff3  
 mv $wdir/0.scripts.logs/braker/augustus.hints.gtf $wdir/2.results/${prefix_name}_augustus.gtf

@@ -29,7 +29,7 @@ cd $PBS_O_WORKDIR
 nhmmer $wdir/1.data/EG_nonTIRhmm $wdir/1.data/$input_fasta > $outdir/${prefix_name}_nonTIRout
 nhmmer $wdir/1.data/EG_TIRhmm $wdir/1.data/$input_fasta > $outdir/${prefix_name}_TIRout
 
-## Output from first step is used to make a bed file to extract NBARC sequences from the original genome fasta. We then combine the two fasta outputs and remove duplicates.
+## Output from first step is used to make a bed file to extract NBARC sequences from the original genome fasta. 
 make_bed_hmmOut.awk $outdir/${prefix_name}_nonTIRout > $outdir/${prefix_name}_nonTIR.bed
 make_bed_hmmOut.awk $outdir/${prefix_name}_TIRout > $outdir/${prefix_name}_TIR.bed
 bedtools getfasta -s -fi $wdir/1.data/$input_fasta -bed $outdir/${prefix_name}_nonTIR.bed -fo $outdir/${prefix_name}_nonTIR.fasta
@@ -64,7 +64,7 @@ cat $outdir/${prefix_name}_NBARC_20kbflanking_sort.bed $outdir/${prefix_name}_ne
 bedtools merge -s -d 1 -c 5,4,6 -o count,distinct,last -i $outdir/${prefix_name}_NBARC_20kb.bed > $outdir/${prefix_name}_NBARC_20kb_merge.bed
 bedtools getfasta -s -fi $wdir/1.data/$input_fasta -bed $outdir/${prefix_name}_NBARC_20kb_merge.bed -fo $outdir/${prefix_name}_NBARC_20kb.fasta
 
-##Step D - Take the previous output ($outdir/${prefix_name}_NBARC_20kb.fasta)  and annotate with Supplemetary Data https://doi.org/10.1101/2020.07.08.193961 (NLR Refseqs aa) as hints in --epmode. Then remove the * from the amino acid augusutus output and scan with interproscan-5 to identify TIR, LRR coils etc. for a complete list and fasta outptut of NLR putative genes. Interproscan will also identify other important domains within proximity to NLRs.
+##Step D - Take the previous output ($outdir/${prefix_name}_NBARC_20kb.fasta)  and annotate with Supplemetary Data https://doi.org/10.1101/2020.07.08.193961 (NLR Refseqs aa) as hints in --epmode. Be aware that braker2 might miss some NLRs. Manual curation is obviously better for the full complement of NLRs. Then remove the * from the amino acid augusutus output and scan with interproscan-5 to identify TIR, LRR coils etc. for a complete list and fasta outptut of NLR putative genes. Interproscan will also identify other important domains within proximity to NLRs.
 
 ##Step E - The output from interproscan needs to be correlated with the augustus.gff3 and to the original genome co-ordinates. Scripts for extracting the gene IDs and chromosome locations as gff3 files are: run_NBARC.sh, run_NBLRR.sh
 

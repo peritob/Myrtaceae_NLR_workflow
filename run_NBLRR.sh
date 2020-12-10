@@ -9,7 +9,7 @@ join temp0 temp1 > NBLRR_list
 # this script outputs the gff3 file for all genes with NB-ARC and LRR domains in the augustus.gff3
 # this is how it works: awk takes a tab delimited file and looks in colum 6 for "NB-ARC domain" OR in column 5 for all LRR Pfam identifiers and removes the ".t1" from gene id in column 1. Then sorts and prints unique gene id into temp0.
 
-# then joins the gene id list temp0 with the augustus.gff3 matched from column 9 and does some formatting. then outputs all mathed lines and adds the scaffold location to column 4 and 5. NB The strand notation for scaffold is transposed into column 7. The logic for this is: the hidden Markov model derived NBARC sequences were identified from the original genome as stranded + or -. This is likely to be the final true strandedness of the gene.
+# then joins the gene id list temp0 with the augustus.gff3 matched from column 9 and does some formatting. Then outputs all matched lines and adds the scaffold location to column 4 and 5. NB The strand notation for scaffold is transposed into column 7. The logic for this is: the hidden Markov model derived NBARC sequences were identified from the original genome as stranded + or -. This is likely to be the final true strandedness of the gene.
 
 
 gawk 'BEGIN {FS="\t"} ($6=="NB-ARC domain" || $5=="G3DSA:3.40.50.300")  {split($1, a, "."); print a[1]}' $1 | sort -k 1b,1 | uniq > temp0

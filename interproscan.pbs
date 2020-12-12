@@ -6,7 +6,7 @@
 #PBS -m abe
 
 #Parameters
-wdir=/scratch/myrtaceae
+wdir=/project/myrtaceae
 outdir=$wdir/2.results
 
 # Load modules
@@ -16,9 +16,8 @@ module load java/jdk-11.0.5
 # Working directory
 cd $PBS_O_WORKDIR
 
-#Run interproscan script to obtain the domain strucutres of predicted 'genes' from braker2. Ensure that the '*' stop codon is removed from the fasta sequence before running.
+#Run interproscan script to obtain the domain strucutres of predicted 'genes' from braker2. Ensure that the '*' stop codon is removed from the fasta sequence before running. Run using this example script: qsub -v input_fasta=E_grandis_augustus_aa.fasta interproscan.pbs
 
-#interproscan.sh -t p -appl COILS,Pfam,SUPERFAMILY -i $wdir/1.data/E_grandis.NLR.aa.fasta -f tsv,gff3 -d $outdir/
 interproscan.sh -t p -appl Pfam,COILS,Gene3D -i $wdir/1.data/$input_fasta -f tsv,gff3 -d $outdir/
 
 

@@ -1,8 +1,8 @@
 #!/bin/bash
 #PBS -P myrtaceae
 #PBS -N braker
-#PBS -l select=1:ncpus=15:mem=10GB
-#PBS -l walltime=5:00:00
+#PBS -l select=1:ncpus=6:mem=5GB
+#PBS -l walltime=8:00:00
 #PBS -e ./braker_eror.txt
 #PBS -o ./braker_output.txt
 #PBS -M peri.tobias@sydney.edu.au
@@ -37,7 +37,7 @@ sed -i 's/(//;s/)//' $wdir/2.results/${prefix_name}_NBARC_20kb.fasta
 
 #to run this script in pbs-pro with example species: qsub -v input_fasta=E_grandis_NBARC_20kb.fasta,input_species=E_grandis,prefix_name=E_grandis braker_nlr.pbs 
 
-braker.pl --cores=15 --genome=$wdir/2.results/$input_fasta --prot_seq=$wdir/1.data/RefPlantNLR_aa.fa --ALIGNMENT_TOOL_PATH=/usr/local/genemark-es/4.59/ProtHint/bin/ --prg=ph --epmode --species=$input_species
+braker.pl --cores=6 --genome=$wdir/2.results/$input_fasta --prot_seq=$wdir/1.data/RefPlantNLR_aa.fa --ALIGNMENT_TOOL_PATH=/usr/local/genemark-es/4.59/ProtHint/bin/ --prg=ph --epmode --species=$input_species
 /usr/local/augustus/3.3.3/scripts/gtf2gff.pl <$wdir/0.scripts.logs/braker/augustus.hints.gtf --printExon --out=$wdir/0.scripts.logs/braker/augustus.gff3 --gff3  
 mv $wdir/0.scripts.logs/braker/augustus.hints.gtf $wdir/2.results/${prefix_name}_augustus.gtf
 mv $wdir/0.scripts.logs/braker/augustus.gff3 $wdir/2.results/${prefix_name}_augustus.gff3

@@ -18,7 +18,7 @@ cd $PBS_O_WORKDIR
 
 #Run interproscan script to obtain the domain strucutres of predicted 'genes' from braker2. Ensure that the '*' stop codon is removed from the fasta sequence before running. Run using this example script: qsub -v input_fasta=E_grandis_augustus_aa.fasta interproscan.pbs
 
-interproscan.sh -t p -appl Pfam,COILS,Gene3D -i $wdir/1.data/$input_fasta -f tsv,gff3 -d $outdir/
+interproscan.sh -t p -appl Pfam,COILS,Gene3D -i $wdir/1.data/$input_fasta -f tsv -d $outdir/
 
 
 module unload interproscan/5.39-77.0

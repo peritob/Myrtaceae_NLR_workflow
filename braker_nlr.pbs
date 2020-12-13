@@ -42,8 +42,9 @@ braker.pl --cores=6 --genome=$wdir/2.results/$input_fasta --prot_seq=$wdir/1.dat
 mv $wdir/0.scripts.logs/braker/augustus.hints.gtf $wdir/2.results/${prefix_name}_augustus.gtf
 mv $wdir/0.scripts.logs/braker/augustus.gff3 $wdir/2.results/${prefix_name}_augustus.gff3
 mv $wdir/0.scripts.logs/braker/augustus.hints.codingseq $wdir/1.data/${prefix_name}_augustus_cds.fasta
-mv $wdir/0.scripts.logs/braker/augustus.hints.aa $wdir/1.data/${prefix_name}_augustus_aa.fasta
-sed s/\*//g $wdir/1.data/${prefix_name}_augustus_aa.fasta
+mv $wdir/0.scripts.logs/braker/augustus.hints.aa $wdir/1.data/${prefix_name}_augustus_hints.aa
+sed s/\*//g $wdir/1.data/${prefix_name}_augustus_hints.aa > $wdir/1.data/${prefix_name}_augustus_aa.fasta
+
 module unload braker2/2.1.5
 module unload genemark-es/4.59
 module unload augustus/3.3.3

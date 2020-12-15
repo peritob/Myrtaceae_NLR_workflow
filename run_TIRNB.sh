@@ -2,11 +2,6 @@
 
 #to run this script: run_TIRNB.sh interproscan_out.tsv augustus_out.gff3 > species_TIRNB.gff3
 
-# to get a list of gene ids to make an NBTIR.fasta
-gawk 'BEGIN {FS="\t"} $5=="PF00931"  { print $1 }' $1 | sort -k 1b,1 | uniq > temp0
-gawk 'BEGIN {FS="\t"} ($5=="PF01582")  { print $1 }' $1 | sort -k 1b,1 | uniq > temp1
-join temp0 temp1 > NBTIR_list
-
 # this script outputs the gff3 file for all genes with NB-ARC and TIR domains in the augustus.gff3
 # this is how it works: awk takes a tab delimited file and looks in colum 6 for "NB-ARC domain" OR in column 5 for all TIR Pfam identifiers and removes the ".t1" from gene id in column 1. Then sorts and prints unique gene id into temp0.
 

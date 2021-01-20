@@ -1,10 +1,10 @@
 #!/bin/bash
 #PBS -P myrtaceae
-#PBS -N HMM
+#PBS -N clade
 #PBS -l select=1:ncpus=2:mem=10GB
 #PBS -l walltime=10:00:00
-#PBS -e ./hmm_eror.txt
-#PBS -o ./hmm_output.txt
+#PBS -e ./clade_eror.txt
+#PBS -o ./clade_output.txt
 #PBS -M peri.tobias@sydney.edu.au
 #PBS -m abe
 

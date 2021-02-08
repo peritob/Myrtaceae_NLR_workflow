@@ -37,7 +37,7 @@ bedtools getfasta -s -fi $wdir/1.data/$input_fasta -bed $outdir/${prefix_name}_T
 
 ##Step B - Use the following method to make *species-specific* NBARC hmms from Myrtaceae genome file using the previous output as training set.
 
-## This awk script will extract first 200 (or designated numeral for variable NSEQS) sequences from previously output nonTIR and TIR.fasta. Then we combine these 400 sequences, remove duplicates and align with clustalo to make stockholm format for next steps of hmmer. This use of E.grandis HMM training set for *species-specific* HMM to extract NBS-LRR genes increases the output of NBARCs.
+## This awk script will extract first 200 (or designated numeral for variable NSEQS) sequences from previously output nonTIR and TIR.fasta. The sequences are in order of significance, therefore top 200 are best results. Then we combine these 400 sequences, remove duplicates and align with clustalo to make stockholm format for next steps of hmmer. This use of E.grandis HMM training set for *species-specific* HMM to extract NBS-LRR genes increases the output of NBARCs.
 NSEQS=200
 awk "/^>/ {n++} n>$NSEQS {exit} 1" $outdir/${prefix_name}_nonTIR.fasta > $outdir/${prefix_name}_nonTIR_200.fasta
 awk "/^>/ {n++} n>$NSEQS {exit} 1" $outdir/${prefix_name}_TIR.fasta > $outdir/${prefix_name}_TIR_200.fasta

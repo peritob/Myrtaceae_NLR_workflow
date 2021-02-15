@@ -55,12 +55,10 @@ translate.py $outdir/${prefix_name}_NBARC_nt.fasta $outdir/${prefix_name}_NBARC_
 grep '^>' $outdir/${prefix_name}_NBARC_aa.fasta > $outdir/${prefix_name}_NBARC_headers.txt
 ##Use the headers from the amino acid NBARC fasta to make an extended bedfile that incorporates +/- (20,000 nt) up and downstream of NBARC with python script so that the extended nucleotide fasta sequences can be extracted from original genome file. This can be used to identify other NLR type motifs such as TIR domains,LRR etc.
 headers_to_bed.py $outdir/${prefix_name}_NBARC_headers.txt 20000 $wdir/1.data/$input_fasta $outdir/${prefix_name}_NBARC_20kbflanking.bed
-#bedtools merge requires that you presort your data by chromosome and then by start position, as below.
-sort -k1,1 -k2,2n $outdir/${prefix_name}_NBARC_20kbflanking.bed > $outdir/${prefix_name}_NBARC_20kbflanking_sort.bed
-#At this point we can incorporate the data output from nlr-annotator. To do this we need to standardise the bed file from nlr-annotator to match column data with ${prefix_name}_NBARC_20kbflanking_sort.bed. We then combine files and merge
+
+##At this point we can incorporate the data output from nlr-annotator. To do this we need to standardise the bed file from nlr-annotator to match column data with ${prefix_name}_NBARC_20kbflanking_sort.bed. We then combine files, sort and merge. Bedtools merge requires that you presort your data by chromosome and then by start position, as below.
 gawk 'BEGIN { OFS = "\t"} ; { col5 = ($6 == "+" ? "forward" : "reverse");  print $1, $2, $3, $1, col5, $6 }' $wdir/1.data/${prefix_name}_nlr.bed > $outdir/${prefix_name}_new_nlr.bed
-sort -k1,1 -k2,2n $outdir/${prefix_name}_new_nlr.bed > $outdir/${prefix_name}_new_sort_nlr.bed
-cat $outdir/${prefix_name}_NBARC_20kbflanking_sort.bed $outdir/${prefix_name}_new_sort_nlr.bed > $outdir/${prefix_name}_NBARC_20kb.bed
+cat $outdir/${prefix_name}_NBARC_20kbflanking.bed $outdir/${prefix_name}_new_nlr.bed > $outdir/${prefix_name}_NBARC_20kb.bed
 sort -k1,1 -k2,2n $outdir/${prefix_name}_NBARC_20kb.bed  > $outdir/${prefix_name}_NBARC_20kb_sort.bed
 bedtools merge -s -d 1 -c 1,5,6 -o distinct,distinct,distinct, -i $outdir/${prefix_name}_NBARC_20kb_sort.bed > $outdir/${prefix_name}_NBARC_20kb_merge.bed
 bedtools getfasta -s -fi $wdir/1.data/$input_fasta -bed $outdir/${prefix_name}_NBARC_20kb_merge.bed -fo $outdir/${prefix_name}_NBARC_20kb.fasta

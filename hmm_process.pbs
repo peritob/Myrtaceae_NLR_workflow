@@ -61,7 +61,7 @@ sort -k1,1 -k2,2n $outdir/${prefix_name}_NBARC_20kbflanking.bed > $outdir/${pref
 gawk 'BEGIN { OFS = "\t"} ; { col5 = ($6 == "+" ? "forward" : "reverse");  print $1, $2, $3, $1, col5, $6 }' $wdir/1.data/${prefix_name}_nlr.bed > $outdir/${prefix_name}_new_nlr.bed
 sort -k1,1 -k2,2n $outdir/${prefix_name}_new_nlr.bed > $outdir/${prefix_name}_new_sort_nlr.bed
 cat $outdir/${prefix_name}_NBARC_20kbflanking_sort.bed $outdir/${prefix_name}_new_sort_nlr.bed > $outdir/${prefix_name}_NBARC_20kb.bed
-bedtools merge -s -d 1 -c 5,4,6 -o count,distinct,last -i $outdir/${prefix_name}_NBARC_20kb.bed > $outdir/${prefix_name}_NBARC_20kb_merge.bed
+bedtools merge -s -d 1 -c 1,5,6 -o distinct,distinct,distinct, -i $outdir/${prefix_name}_NBARC_20kb.bed > $outdir/${prefix_name}_NBARC_20kb_merge.bed
 bedtools getfasta -s -fi $wdir/1.data/$input_fasta -bed $outdir/${prefix_name}_NBARC_20kb_merge.bed -fo $outdir/${prefix_name}_NBARC_20kb.fasta
 
 ##Step D - Take the previous output ($outdir/${prefix_name}_NBARC_20kb.fasta)  and annotate with Supplemetary Data https://doi.org/10.1101/2020.07.08.193961 (NLR Refseqs aa) as hints in --epmode. Be aware that braker2 might miss some NLRs. Manual curation is obviously better for the full complement of NLRs. Then remove the * from the amino acid augusutus output and scan with interproscan-5 to identify TIR, LRR coils etc. for a complete list and fasta outptut of NLR putative genes. Interproscan will also identify other important domains within proximity to NLRs.

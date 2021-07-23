@@ -1,0 +1,35 @@
+#PBS -P myrtaceae
+#PBS -N interproscan
+#PBS -l select=1:ncpus=4:mem=15gb
+#PBS -l walltime=5:00:00
+#PBS -M peri.tobias@sydney.edu.au
+#PBS -m abe
+
+#Parameters
+wdir=/scratch/myrtaceae
+outdir=$wdir/2.results
+
+# Load modules
+module load interproscan/5.39-77.0
+module load java/jdk-11.0.5
+module load python/3.6.5
+
+# Working directory
+cd $PBS_O_WORKDIR
+
+#Run interproscan script to obtain the domain strucutres of predicted 'genes' from braker2. Ensure that the '*' stop codon is removed from the fasta sequence before running. Run using this example script: qsub -v prefix_name=E_grandis interproscan_20kb.pbs
+#You need to rename or move the file being changed by sed, for example:
+
+sed s/\*//g  $outdir/aa_fasta/${prefix_name}_augustus_aa.fasta > $outdir/interpro_out/${prefix_name}_augustus_aa.fasta
+
+interproscan.sh -t p -appl Pfam,COILS,Gene3D -i $outdir/interpro_out/${prefix_name}_augustus_aa.fasta -f tsv -d $outdir/interpro_out/
+#extract gene locations that correspond with NBLRRs for species and rename gene list to species name 
+run_NBLRR.sh $outdir/interpro_out/${prefix_name}_augustus_aa.fasta.tsv $outdir/gff/${prefix_name}_augustus.gff3 > $outdir/NBLRR/${prefix_name}_NBLRR.gff3
+mv NBLRR_list $outdir/NBLRR/${prefix_name}_NBLRR_list
+#extract NBLRR amino acid and coding sequence fasta files 
+extigfasta.py  $outdir/aa_fasta/${prefix_name}_augustus_aa.fasta $outdir/NBLRR/${prefix_name}_NBLRR_list $outdir/NBLRR_aa_fasta/${prefix_name}_NBLRR_aa.fasta
+extigfasta.py  $outdir/cds_fasta/${prefix_name}_augustus_cds.fasta $outdir/NBLRR/${prefix_name}_NBLRR_list $outdir/NBLRR_cds_fasta/${prefix_name}_NBLRR_cds.fasta
+
+module unload interproscan/5.39-77.0
+module unload java/jdk-11.0.5
+module unload python/3.6.5

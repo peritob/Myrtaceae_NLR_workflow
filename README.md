@@ -5,7 +5,7 @@
 #### Use NLR-annotator https://doi.org/10.1104/pp.19.01273 as an initial approach.
 #### Use the hidden Markov model workflow as described below.
 
-NB: The process is fully documented in hmm_process.pbs
+## NB: The process is fully documented in hmm_process.pbs script. Warning this ReadMe needs updating!!
 
 
 1. hmmer/3.3 was used with the nhmmer function and DNA profile hidden markov models (EG_hmm) derived from *Eucalyptus grandis* alignments of the conserved nucleotide binding domain shared by Apaf-1, Resistance proteins and CED4 (NBARC) from coiled-coil (CC) NLR (here named nonTIR) and Toll interleukin-1 (TIR) NLR sequences. These EG_hmms were screened against the Myrtaceae_species_genome.fasta (where Myrtaceae_species refers to a species, for example Eucalyptus pauciflora). 

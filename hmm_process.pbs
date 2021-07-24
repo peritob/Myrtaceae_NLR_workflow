@@ -63,9 +63,9 @@ sort -k1,1 -k2,2n $outdir/${prefix_name}_NBARC_20kb.bed  > $outdir/${prefix_name
 bedtools merge -s -d 1 -c 1,5,6 -o distinct,distinct,distinct, -i $outdir/${prefix_name}_NBARC_20kb_sort.bed > $outdir/${prefix_name}_NBARC_20kb_merge.bed
 bedtools getfasta -s -fi $wdir/1.data/$input_fasta -bed $outdir/${prefix_name}_NBARC_20kb_merge.bed -fo $outdir/${prefix_name}_NBARC_20kb.fasta
 
-##Step D - Take the previous output ($outdir/${prefix_name}_NBARC_20kb.fasta)  and annotate with Supplemetary Data https://doi.org/10.1101/2020.07.08.193961 (NLR Refseqs aa) as hints in --epmode. Be aware that braker2 might miss some NLRs. Manual curation is obviously better for the full complement of NLRs. Then remove the * from the amino acid augusutus output and scan with interproscan-5 to identify TIR, LRR coils etc. for a complete list and fasta outptut of NLR putative genes. Interproscan will also identify other important domains within proximity to NLRs.
+##Step D - Take the previous output ($outdir/${prefix_name}_NBARC_20kb.fasta) and annotate with Supplemetary Data https://doi.org/10.1101/2020.07.08.193961 (NLR Refseqs aa) as hints for braker2 (see braker_nlr.pbs script) in --epmode. Be aware that braker2 might miss some NLRs. Manual curation is obviously better for the full complement of NLRs. Then remove the * from the braker2 amino acid augusutus output and scan with interproscan-5 (see interproscan.pbs script) to identify TIR, LRR coils etc. for a complete list and fasta outptut of NLR putative genes. Interproscan will also identify other important domains within proximity to NLRs.
 
-##Step E - The output from interproscan needs to be correlated with the augustus.gff3 and to the original genome co-ordinates. Scripts for extracting the gene IDs and chromosome locations as gff3 files are: run_NBARC.sh, run_NBLRR.sh
+##Step E - The output from interproscan (ie. the tsv file) needs to be correlated with the augustus.gff3 and to the original genome co-ordinates. Scripts for extracting the gene IDs and chromosome locations as gff3 files are: run_NBARC.sh, run_NBLRR.sh
 
 module unload seqkit/0.10.1
 module unload hmmer/3.3

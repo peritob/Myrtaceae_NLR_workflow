@@ -24,11 +24,11 @@ sed s/\*//g  $outdir/aa_fasta/${prefix_name}_augustus_aa.fasta > $outdir/interpr
 
 interproscan.sh -t p -appl Pfam,COILS,Gene3D -i $outdir/interpro_out/${prefix_name}_augustus_aa.fasta -f tsv -d $outdir/interpro_out/
 #extract gene locations that correspond with NBLRRs for species and rename gene list to species name 
-run_NBLRR.sh $outdir/interpro_out/${prefix_name}_augustus_aa.fasta.tsv $outdir/gff/${prefix_name}_augustus.gff3 > $outdir/NBLRR/${prefix_name}_NBLRR.gff3
+./run_NBLRR.sh $outdir/interpro_out/${prefix_name}_augustus_aa.fasta.tsv $outdir/gff/${prefix_name}_augustus.gff3 > $outdir/NBLRR/${prefix_name}_NBLRR.gff3
 mv NBLRR_list $outdir/NBLRR/${prefix_name}_NBLRR_list
 #extract NBLRR amino acid and coding sequence fasta files 
-extigfasta.py  $outdir/aa_fasta/${prefix_name}_augustus_aa.fasta $outdir/NBLRR/${prefix_name}_NBLRR_list $outdir/NBLRR_aa_fasta/${prefix_name}_NBLRR_aa.fasta
-extigfasta.py  $outdir/cds_fasta/${prefix_name}_augustus_cds.fasta $outdir/NBLRR/${prefix_name}_NBLRR_list $outdir/NBLRR_cds_fasta/${prefix_name}_NBLRR_cds.fasta
+./extigfasta.py  $outdir/aa_fasta/${prefix_name}_augustus_aa.fasta $outdir/NBLRR/${prefix_name}_NBLRR_list $outdir/NBLRR_aa_fasta/${prefix_name}_NBLRR_aa.fasta
+./extigfasta.py  $outdir/cds_fasta/${prefix_name}_augustus_cds.fasta $outdir/NBLRR/${prefix_name}_NBLRR_list $outdir/NBLRR_cds_fasta/${prefix_name}_NBLRR_cds.fasta
 
 module unload interproscan/5.39-77.0
 module unload java/jdk-11.0.5

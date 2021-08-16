@@ -49,7 +49,7 @@ nhmmer $wdir/1.data/${prefix_name}.hmm $wdir/1.data/$input_fasta > $outdir/${pre
 make_bed_hmmOut.awk $outdir/${prefix_name}_NBARCout > $outdir/${prefix_name}_NBARC.bed
 bedtools getfasta -s -fi $wdir/1.data/$input_fasta -bed $outdir/${prefix_name}_NBARC.bed -fo $outdir/${prefix_name}_NBARC_nt.fasta
 
-##Step C - Translate Nucleotide NBARC sequences - 6-frame translations plus longest ORF frame output to fasta for downstream analysis, including extracting extended regions around NBARC domains from original genome and incorporating NLR-annotator defined loci.
+##Step C - Translate Nucleotide NBARC sequences - 6-frame translations plus longest ORF frame output to fasta for downstream analysis. This step ensures that hmm profiled regions are potential ORFs rather than non-coding.. 
 translate.py $outdir/${prefix_name}_NBARC_nt.fasta $outdir/${prefix_name}_NBARC_aa.fasta
 ##Extract headers from NBARC_aa.fasta
 grep '^>' $outdir/${prefix_name}_NBARC_aa.fasta > $outdir/${prefix_name}_NBARC_headers.txt

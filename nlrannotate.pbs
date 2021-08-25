@@ -1,0 +1,23 @@
+#!/bin/bash
+#PBS -P myrtaceae
+#PBS -N NLR
+#PBS -l select=1:ncpus=4:mem=50GB
+#PBS -l walltime=20:00:00
+#PBS -e ./nlr_eror.txt
+#PBS -o ./nlr_output.txt
+#PBS -m abe
+
+# Load modules
+module load java/jdk1.8.0_111
+module load meme/4.9.1
+
+cd $PBS_O_WORKDIR
+#run NLRannotator
+#java -Xmx50G -jar ChopSequence.jar -i /project/myrtaceae/1.data/${prefix_name}.fasta -o ${prefix_name}_NLR_chop.fasta -l 20000 -p 5000
+#java -Xmx50G -jar NLR-Parser.jar -t 4 -y /usr/local/meme/4.9.1/bin/mast -x meme.xml -i ${prefix_name}_NLR_chop.fasta -c ${prefix_name}_output.nlr.xml
+java -Xmx50G -jar NLR-Annotator.jar -i ${prefix_name}_output.nlr.xml -o ${prefix_name}_output.nlr.txt -g ${prefix_name}_output.nlr.gff -b ${prefix_name}_output.nlr.bed -a ${prefix_name}_motif_output.nlr_aln.fasta
+#next step not required for our annotation pipeline. We only need the bed file.
+#java -Xmx50G -jar NLR-Annotator.jar -i ${prefix_name}_output.nlr.xml -f /project/myrtaceae/1.data/${prefix_name}.fasta  ${prefix_name}_output.nlr.fasta 1500
+
+module unload java/jdk1.8.0_111
+module unload meme/4.9.1

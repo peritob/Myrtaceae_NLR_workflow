@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-#Adapted from awk script from https://github.com/peritob/Myrtaceae_NLR_workflow
+#Adapted from bash scripts from https://github.com/peritob/Myrtaceae_NLR_workflow
+#Further adapted from https://github.com/ZhenyanLuo/FindPlantNLRs/
+
 #Use for NLR classification step in the snakemake pipeline
 #This script can be used individually by running 'bash run_classification.sh {interproscan.tsv} {augustus.gff3}'
 TSV_FILE=$1
@@ -27,7 +29,7 @@ gawk 'BEGIN {FS="\t"; OFS="\t"} {split($9, a, "[=\\.;]"); print a[2], NR, $0}' $
 gawk 'BEGIN {FS="\t"} $5=="PF00931" {print $1}' $TSV_FILE | sort -k 1b,1 | uniq > ${OUT_PREFIX}_NBARC.list
 gawk '{split($1, a, "."); print a[1]}' ${OUT_PREFIX}_NBARC.list | sort -k 1b,1 | uniq > NBARC_temp_1
 join NBARC_temp_1 GFF3_temp | sort -k2,2 -n > NBARC_temp_2
-# Reformat rows to produce new gff3 file
+# Reformat rows to produce new gff3 file. This outputs the annotated gene co-ordinates and orientation based on the original genome using braker outputs.
 gawk 'BEGIN {FS="\t"; OFS="\t"} {split($3, a, "[:\\-+]"); print  a[1], $4, $5, (a[2]+$6), (a[2]+$7), $8, $9, $10, $11}' NBARC_temp_2 > ${OUT_PREFIX}_NBARC.gff3
 for files in NBARC_temp_*; do rm ${files}; done
 
